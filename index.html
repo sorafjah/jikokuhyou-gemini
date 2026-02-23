@@ -128,10 +128,19 @@
             table-layout: fixed;
         }
         th, td { border: 1px solid var(--border-color); padding: 6px; }
-        th { font-weight: normal; }
+        th { 
+            font-weight: normal; 
+            background-color: var(--gray-light) !important; 
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+        }
         
         /* 1時間おきに薄いグレー */
-        #timetableBody tr:nth-child(even) { background-color: var(--gray-light) !important; }
+        #timetableBody tr:nth-child(even) { 
+            background-color: var(--gray-light) !important; 
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+        }
 
         .hour {
             font-weight: bold; width: 50px; text-align: center;
@@ -164,6 +173,17 @@
             text-underline-offset: 4px; 
             letter-spacing: 2px;
         }
+
+        /* 編集可能エリアのスタイル */
+        [contenteditable="true"] {
+            outline: none;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        [contenteditable="true"]:hover {
+            background-color: #ffffcc;
+            cursor: text;
+        }
         
         /* 問題文中の数字を少し見やすく */
         .num-font { font-family: "Arial", sans-serif; }
@@ -179,11 +199,11 @@
         <h3>1. 時刻表の設定</h3>
         <label>発車時刻：
             <select id="intervalType" style="font-size: 12pt; padding: 5px;">
-                <option value="5">5分ずつ</option>
-                <option value="1">1分ずつ</option>
+                <option value="5">5分ごと</option>
+                <option value="1">1分ごと</option>
             </select>
         </label>
-        <p style="font-size: 11pt; color: #666; margin-top: 5px;">※時刻表は6時〜18時の間から、ランダムに6時間分作成されます。</p>
+        <p style="font-size: 11pt; color: #666; margin-top: 5px;">※時刻表は6時〜18時の間から、ランダムに8時間分作成されます。</p>
     </div>
 
     <div class="config-section">
@@ -191,13 +211,13 @@
         <label>問題数： <input type="number" id="qCount" value="5" min="1" max="20"> 問</label>
         
         <div class="checkbox-list" style="margin-top: 15px;">
-            <label><input type="checkbox" id="type1" checked> 「いま駅にいて、○時○分です。次に来る電車は何時何分ですか？」</label>
+            <label><input type="checkbox" id="type1" checked> 「いま駅にいて、○時○分です。すぐ乗れる電車は何時何分ですか？」</label>
             <label><input type="checkbox" id="type2" checked> 「いま駅にいて、○時○分です。電車はあと何分で来ますか？」</label>
-            <label><input type="checkbox" id="type3" checked> 「家を○時○分に出発します。何時○分の電車に乗れますか？」</label>
-            <label><input type="checkbox" id="type4" checked> 「何時○分の電車に乗るには、家を何時何分に出発したらいいですか？」</label>
+            <label><input type="checkbox" id="type3" checked> 「家を○時○分に出発します。何時何分の電車に乗れますか？」</label>
+            <label><input type="checkbox" id="type4" checked> 「○時○分の電車に乗るには、家を何時何分に出発したらいいですか？」</label>
             <label><input type="checkbox" id="type5" checked> 「○時○分の電車に乗ると、〇〇駅に何時何分に着きますか？」</label>
-            <label><input type="checkbox" id="type6" checked> 「〇〇駅に何時何分に着くには、何時何分の電車に乗ればいいですか？」</label>
-            <label><input type="checkbox" id="type7" checked> 「〇〇駅に何時何分に着くには、家を何時何分に出発したらいいですか？」</label>
+            <label><input type="checkbox" id="type6" checked> 「〇〇駅に○時○分に着くには、何時何分の電車に乗ればいいですか？」</label>
+            <label><input type="checkbox" id="type7" checked> 「〇〇駅に○時○分に着くには、家を何時何分に出発したらいいですか？」</label>
         </div>
     </div>
 
@@ -205,15 +225,20 @@
         <h3>3. 所要時間と時刻の設定</h3>
         <label>家から駅まで：
             <select id="homeToStationType" style="font-size: 12pt; padding: 5px;">
-                <option value="5">5分ずつ</option>
+                <option value="5">5分ごと</option>
                 <option value="1">ランダム</option>
             </select>
         </label><br>
-        <label style="margin-top: 10px;">駅から目的駅まで： <input type="number" id="stationToDest" value="30" min="1" max="120"> 分</label><br>
+        <label style="margin-top: 10px;">駅から目的駅まで：
+            <select id="stationToDestType" style="font-size: 12pt; padding: 5px;">
+                <option value="5">5分ごと</option>
+                <option value="1">ランダム</option>
+            </select>
+        </label><br>
         <label style="margin-top: 10px;">家を出発する時刻（現在時刻）：
             <select id="baseTimeType" style="font-size: 12pt; padding: 5px;">
-                <option value="5">5分ずつ</option>
-                <option value="1">1分ずつ</option>
+                <option value="5">5分ごと</option>
+                <option value="1">1分ごと</option>
             </select>
         </label>
     </div>
@@ -229,12 +254,12 @@
     </div>
 
     <div class="print-container">
-        <h1><ruby>時刻表<rt>じこくひょう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby></h1>
+        <h1 contenteditable="true"><ruby>時刻表<rt>じこくひょう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby></h1>
         <div class="name-field"><ruby>名前<rt>なまえ</rt></ruby>：<span></span></div>
 
-        <p><ruby>次<rt>つぎ</rt></ruby>の<ruby>時刻表<rt>じこくひょう</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、<ruby>下<rt>した</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えなさい。</p>
+        <p contenteditable="true"><ruby>次<rt>つぎ</rt></ruby>の<ruby>時刻表<rt>じこくひょう</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、<ruby>下<rt>した</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えましょう。</p>
         
-        <table id="timetable">
+        <table id="timetable" contenteditable="true">
             <thead>
                 <tr>
                     <th class="hour"><ruby>時<rt>じ</rt></ruby></th>
@@ -253,17 +278,17 @@
         </table>
 
         <!-- 時刻表下の所要時間表示 -->
-        <div class="travel-times" id="travelTimesDisplay"></div>
+        <div class="travel-times" id="travelTimesDisplay" contenteditable="true"></div>
 
         <!-- 問題リスト -->
-        <div class="q-list" id="questionList"></div>
+        <div class="q-list" id="questionList" contenteditable="true"></div>
     </div>
 </div>
 
 <script>
 let currentTimetable = {};
 let tableStartHour = 6;
-let tableEndHour = 11;
+let tableEndHour = 13;
 
 function padZero(num) {
     return num.toString().padStart(2, '0');
@@ -297,9 +322,9 @@ function generateTimetable(isRandomMins) {
         13: 4, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8
     };
 
-    // 6時から13時の間でスタート時間を決める（6時間分なので最大13時スタート→18時終わり）
-    tableStartHour = getRandomInt(6, 13);
-    tableEndHour = tableStartHour + 5;
+    // 6時から11時の間でスタート時間を決める（8時間分なので最大11時スタート→18時終わり）
+    tableStartHour = getRandomInt(6, 11);
+    tableEndHour = tableStartHour + 7;
 
     for (let h = tableStartHour; h <= tableEndHour; h++) {
         let mins = [];
@@ -342,7 +367,6 @@ function generateTimetable(isRandomMins) {
 
 // 問題全体の生成
 function generateProblem() {
-    const stationToDest = parseInt(document.getElementById('stationToDest').value, 10);
     const qCount = parseInt(document.getElementById('qCount').value, 10);
     
     // 家から駅までの時間を決定
@@ -351,6 +375,14 @@ function generateProblem() {
         homeToStation = getRandomInt(1, 6) * 5; // 5, 10, 15, 20, 25, 30
     } else {
         homeToStation = getRandomInt(5, 30); // 5〜30分のランダム
+    }
+
+    // 駅から目的駅までの時間を決定
+    let stationToDest = 0;
+    if (document.getElementById('stationToDestType').value === '5') {
+        stationToDest = getRandomInt(2, 9) * 5; // 10, 15... 45
+    } else {
+        stationToDest = getRandomInt(10, 50); // 10〜50分のランダム
     }
 
     // 行き先のランダム選択
@@ -382,8 +414,8 @@ function generateProblem() {
     document.getElementById('displayDest').innerHTML = `<ruby>${destName}<rt>${destRuby}</rt></ruby>`;
 
     // 所要時間表示
-    document.getElementById('travelTimesDisplay').innerText = 
-        `（家から近くの駅まで ${homeToStation} 分、近くの駅から${destName}駅まで ${stationToDest} 分）`;
+    document.getElementById('travelTimesDisplay').innerHTML = 
+        `（<ruby>家<rt>いえ</rt></ruby>から<ruby>近<rt>ちか</rt></ruby>くの<ruby>駅<rt>えき</rt></ruby>まで <span class="num-font">${homeToStation}</span> <ruby>分<rt>ふん</rt></ruby>、<ruby>近<rt>ちか</rt></ruby>くの<ruby>駅<rt>えき</rt></ruby>から<ruby>${destName}<rt>${destRuby}</rt></ruby><ruby>駅<rt>えき</rt></ruby>まで <span class="num-font">${stationToDest}</span> <ruby>分<rt>ふん</rt></ruby>）`;
 
     // 扱いやすいように時刻表を「絶対分（0:00からの分数）」の1次元配列にする
     let timetableAbs = [];
@@ -416,7 +448,7 @@ function generateProblem() {
         if (type === 1) {
             let trainMin = timetableAbs.find(t => t >= baseMin) || lastTrainMin;
             let bH = Math.floor(baseMin / 60); let bM = baseMin % 60;
-            qText = `いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">${bH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(bM)}</span><ruby>分<rt>ふん</rt></ruby>です。<ruby>次<rt>つぎ</rt></ruby>に<ruby>来<rt>く</rt></ruby>る<ruby>電車<rt>でんしゃ</rt></ruby>は<ruby>何時何分<rt>なんじなんぷん</rt></ruby>ですか。`;
+            qText = `いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">${bH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(bM)}</span><ruby>分<rt>ふん</rt></ruby>です。すぐ<ruby>乗<rt>の</rt></ruby>れる<ruby>電車<rt>でんしゃ</rt></ruby>は<ruby>何時何分<rt>なんじなんぷん</rt></ruby>ですか。`;
         }
         else if (type === 2) {
             let trainMin = timetableAbs.find(t => t >= baseMin) || lastTrainMin;
