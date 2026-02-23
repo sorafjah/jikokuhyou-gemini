@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>時刻表問題</title>
     <style>
-        /* 印刷・画面共通の基本設定 */
+        /* 共通設定 */
         :root {
             --text-color: #000000;
             --bg-color: #ffffff;
-            --gray-light: #e0e0e0;
+            --gray-light: #f2f2f2;
             --border-color: #000000;
         }
 
         body {
-            /* 読みやすいUDフォントを最優先、なければ游ゴシック */
             font-family: "BIZ UDPGothic", "BIZ UDPゴシック", "Yu Gothic", "游ゴシック", sans-serif;
             color: var(--text-color);
             background-color: var(--bg-color);
@@ -24,22 +23,72 @@
             font-size: 14pt;
         }
 
-        /* 印刷設定: A4一枚に収める、グレースケール */
-        @media print {
-            .no-print { display: none !important; }
-            body { padding: 0; font-size: 12pt; }
-            @page { size: A4 portrait; margin: 15mm; }
-            .container { border: none !important; padding: 0 !important; }
-            /* 印刷時に要素がページをまたがないようにする */
-            .question-area { page-break-inside: avoid; }
+        /* ----- 設定画面用スタイル ----- */
+        #page-config {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f8f8f8;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
         }
+        .config-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .config-section h3 { margin-top: 0; font-size: 16pt; }
+        
+        input[type="number"] {
+            width: 70px;
+            font-size: 1.1em;
+            padding: 5px;
+            text-align: right;
+            margin: 0 5px;
+            font-family: "Arial", sans-serif;
+        }
+        label { display: inline-block; margin-bottom: 10px; cursor: pointer; }
+        .checkbox-list label { display: block; margin-bottom: 8px; font-size: 12pt; }
+        
+        .create-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 16pt;
+            font-weight: bold;
+            color: #fff;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .create-btn:hover { background-color: #555; }
 
-        .container {
+        /* ----- 印刷画面用スタイル ----- */
+        #page-print { display: none; }
+        
+        .print-container {
             max-width: 800px;
             margin: 0 auto;
             border: 1px solid var(--border-color);
             padding: 30px;
             box-sizing: border-box;
+            background: #fff;
+        }
+
+        .action-buttons {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .action-buttons button {
+            font-size: 12pt; padding: 8px 15px; margin-left: 10px; cursor: pointer;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; font-size: 12pt; }
+            @page { size: A4 portrait; margin: 15mm; }
+            .print-container { border: none !important; padding: 0 !important; }
         }
 
         h1 {
@@ -53,240 +102,217 @@
 
         .name-field {
             text-align: right;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 14pt;
         }
         .name-field span {
             border-bottom: 1px solid var(--border-color);
-            display: inline-block;
-            width: 200px;
-            height: 1.2em;
+            display: inline-block; width: 200px; height: 1.2em;
         }
 
-        /* 数字と特定の記号を大きくする設定 */
-        .num-symbol {
-            font-size: 1.3em;
-            font-weight: bold;
-            font-family: "Arial", sans-serif; /* 数字をはっきりさせるため */
-        }
-
-        /* 時刻表のスタイル */
+        /* 時刻表 */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            margin-bottom: 25px;
             table-layout: fixed;
         }
-        th, td {
-            border: 1px solid var(--border-color);
-            text-align: center;
-            padding: 4px;
-        }
-        th {
-            background-color: var(--gray-light);
-            font-weight: normal;
-        }
+        th, td { border: 1px solid var(--border-color); padding: 6px; }
+        th { font-weight: normal; }
+        
+        /* 1時間おきに薄いグレー */
+        #timetableBody tr:nth-child(even) { background-color: var(--gray-light) !important; }
+
         .hour {
-            font-weight: bold;
-            width: 50px;
-            font-size: 1.2em;
+            font-weight: bold; width: 50px; text-align: center;
+            font-size: 1.2em; font-family: "Arial", sans-serif;
         }
-        .minutes {
-            text-align: left;
-            padding-left: 15px;
-            letter-spacing: 5px;
-            font-size: 1.1em;
-        }
-
-        /* 問題文エリア */
-        .question-area {
-            margin-top: 20px;
-            padding: 20px;
-            border: 2px solid var(--border-color);
-        }
-        .question-text {
-            margin-bottom: 20px;
-            margin-left: 25px;
-            text-indent: -25px; /* 記号のぶら下げインデント */
-        }
-        .sub-question {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        /* 解答欄 */
-        .answer-area {
-            text-align: right;
-            margin-top: 30px;
-            padding-right: 20px;
-        }
-        .answer-line {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        /* 設定パネル（印刷時は消える） */
-        .config-panel {
-            background: #f8f8f8;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 12pt;
-        }
-        .config-panel select, .config-panel button {
+        .minutes { text-align: left; padding-left: 15px; letter-spacing: 5px; font-size: 1.1em; }
+        
+        .travel-times {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
             font-size: 11pt;
-            padding: 4px 8px;
-            margin-right: 15px;
-            margin-bottom: 10px;
         }
-        .config-panel button {
-            cursor: pointer;
-            background-color: #fff;
-            border: 1px solid #333;
+
+        /* 問題文と解答欄 */
+        .q-list { margin-top: 20px; }
+        .q-item {
+            margin-bottom: 25px;
+            page-break-inside: avoid; /* 印刷時に行またぎを防ぐ */
+            line-height: 2.0;
         }
-        .config-panel button:hover {
-            background-color: #eee;
+        .q-num { margin-right: 5px; font-family: "Arial", sans-serif; }
+        .q-ans {
+            margin-left: 10px;
+            display: inline-block;
+            white-space: nowrap;
         }
+        .q-ans u { text-decoration-thickness: 1px; text-underline-offset: 4px; }
+        
+        /* 問題文中の数字を少し見やすく */
+        .num-font { font-family: "Arial", sans-serif; }
     </style>
 </head>
 <body>
 
-<div class="no-print config-panel">
-    <strong style="display:block; margin-bottom:10px;">設定画面（印刷時には消えます）</strong>
-    
-    <label>間隔：
-        <select id="intervalType">
-            <option value="5">5分おき（均等）</option>
-            <option value="1">1分単位（ランダム）</option>
-        </select>
-    </label>
-    
-    <label>出発の状況：
-        <select id="startPos">
-            <option value="random">ランダム</option>
-            <option value="station">駅にいる</option>
-            <option value="home">家にいる</option>
-        </select>
-    </label>
+<!-- ===== 設定画面 ===== -->
+<div id="page-config">
+    <h1 style="border: none;">問題設定</h1>
 
-    <label>行き先：
-        <select id="destination">
-            <option value="random">ランダム</option>
-            <option value="青空,あおぞら">青空駅</option>
-            <option value="希望,きぼう">希望駅</option>
-            <option value="未来,みらい">未来駅</option>
-            <option value="桜町,さくらまち">桜町駅</option>
-            <option value="朝日,あさひ">朝日駅</option>
-        </select>
-    </label>
-
-    <label>所要時間：
-        <select id="duration">
-            <option value="random">ランダム</option>
-            <option value="12">12分</option>
-            <option value="18">18分</option>
-            <option value="24">24分</option>
-            <option value="35">35分</option>
-        </select>
-    </label>
-
-    <div style="margin-top: 10px;">
-        <button onclick="generateProblem()">新しい問題を作成</button>
-        <button onclick="window.print()" style="font-weight: bold;">印刷する</button>
+    <div class="config-section">
+        <h3>1. 所要時間</h3>
+        <label>家から駅まで： <input type="number" id="homeToStation" value="15" min="1" max="60"> 分</label><br>
+        <label>駅から目的駅まで： <input type="number" id="stationToDest" value="30" min="1" max="120"> 分</label>
     </div>
+
+    <div class="config-section">
+        <h3>2. 時刻表の設定</h3>
+        <label>行き先：
+            <select id="destination" style="font-size: 12pt; padding: 5px;">
+                <option value="青空,あおぞら">青空駅</option>
+                <option value="希望,きぼう">希望駅</option>
+                <option value="未来,みらい">未来駅</option>
+            </select>
+        </label><br>
+        <label style="margin-top: 10px;">電車のきまり：
+            <select id="intervalType" style="font-size: 12pt; padding: 5px;">
+                <option value="5">等間隔（分かりやすい）</option>
+                <option value="1">1分単位（ランダム）</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="config-section">
+        <h3>3. 問題の条件</h3>
+        <label>問題数： <input type="number" id="qCount" value="5" min="1" max="20"> 問</label>
+        
+        <div style="margin-top: 15px;">
+            <strong>現在時刻の設定（「いま〇時〇分です」の問題に適用）：</strong><br>
+            <label><input type="radio" name="timeType" id="timeRandom" checked onchange="toggleTimeInput()"> ランダム</label>
+            <label style="margin-left: 15px;">
+                <input type="radio" name="timeType" id="timeSpec" onchange="toggleTimeInput()"> 指定する：
+                <input type="number" id="specHour" value="8" min="7" max="18" disabled> 時
+                <input type="number" id="specMin" value="30" min="0" max="59" disabled> 分
+            </label>
+        </div>
+    </div>
+
+    <div class="config-section">
+        <h3>4. 問題の種類（出題したいものにチェック）</h3>
+        <div class="checkbox-list">
+            <label><input type="checkbox" id="type1" checked> 「いま駅にいて、○時○分です。次に来る電車は何時何分ですか？」</label>
+            <label><input type="checkbox" id="type2" checked> 「いま駅にいて、○時○分です。電車はあと何分で来ますか？」</label>
+            <label><input type="checkbox" id="type3" checked> 「家を○時○分に出発します。何時○分の電車に乗れますか？」</label>
+            <label><input type="checkbox" id="type4" checked> 「何時○分の電車に乗るには、家を何時何分に出発したらいいですか？」</label>
+            <label><input type="checkbox" id="type5" checked> 「○時○分の電車に乗ると、〇〇駅に何時何分に着きますか？」</label>
+            <label><input type="checkbox" id="type6" checked> 「〇〇駅に何時何分に着くには、何時何分の電車に乗ればいいですか？」</label>
+            <label><input type="checkbox" id="type7" checked> 「〇〇駅に何時何分に着くには、家を何時何分に出発したらいいですか？」</label>
+        </div>
+    </div>
+
+    <button class="create-btn" onclick="buildAndShow()">問題を作成する</button>
 </div>
 
-<div class="container">
-    <h1><ruby>時刻表<rt>じこくひょう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby></h1>
-    <div class="name-field"><ruby>名前<rt>なまえ</rt></ruby>：<span></span></div>
+<!-- ===== 印刷画面 ===== -->
+<div id="page-print">
+    <div class="no-print action-buttons">
+        <button onclick="showConfig()">設定に戻る</button>
+        <button onclick="window.print()" style="font-weight: bold; border: 2px solid #000;">このまま印刷する</button>
+    </div>
 
-    <p><ruby>次<rt>つぎ</rt></ruby>の<ruby>時刻表<rt>じこくひょう</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、<ruby>下<rt>した</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えなさい。</p>
-    
-    <table id="timetable">
-        <thead>
-            <tr>
-                <th class="hour"><ruby>時<rt>じ</rt></ruby></th>
-                <th class="minutes"><ruby>分<rt>ふん</rt></ruby>（<span id="displayDestinationTable"></span> <ruby>行<rt>ゆ</rt></ruby>き）</th>
-            </tr>
-        </thead>
-        <tbody id="timetableBody">
-            <!-- JSで時刻表を生成 -->
-        </tbody>
-    </table>
+    <div class="print-container">
+        <h1><ruby>時刻表<rt>じこくひょう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby></h1>
+        <div class="name-field"><ruby>名前<rt>なまえ</rt></ruby>：<span></span></div>
 
-    <div class="question-area">
-        <div class="question-text">
-            <span class="num-symbol">△</span> <ruby>問題<rt>もんだい</rt></ruby>：<br>
-            <span id="qTextContext"></span>
-        </div>
+        <p><ruby>次<rt>つぎ</rt></ruby>の<ruby>時刻表<rt>じこくひょう</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、<ruby>下<rt>した</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えなさい。</p>
         
-        <div class="sub-question">
-            (<span class="num-symbol">1</span>) 一番<ruby>早<rt>はや</rt></ruby>く<ruby>乗<rt>の</rt></ruby>れる<ruby>電車<rt>でんしゃ</rt></ruby>は、<ruby>何時何分発<rt>なんじなんぷんはつ</rt></ruby>ですか。
-        </div>
-        <div class="sub-question" id="qTextArrival">
-            <!-- JSで到着時刻を問う問題を生成 -->
-        </div>
+        <table id="timetable">
+            <thead>
+                <tr>
+                    <th class="hour"><ruby>時<rt>じ</rt></ruby></th>
+                    <th class="minutes" style="padding: 0;">
+                        <!-- ヘッダーの配置調整 -->
+                        <div style="display: flex; align-items: center; padding: 6px 15px;">
+                            <span><ruby>分<rt>ふん</rt></ruby></span>
+                            <span style="flex-grow: 1; text-align: center;">（<span id="displayDest"></span> <ruby>行<rt>ゆ</rt></ruby>き）</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="timetableBody">
+                <!-- JSで時刻表を生成 -->
+            </tbody>
+        </table>
 
-        <div class="answer-area">
-            <div class="answer-line">
-                <span class="num-symbol">▽</span> <ruby>答<rt>こた</rt></ruby>え (<span class="num-symbol">1</span>)：<u>　　<ruby>時<rt>じ</rt></ruby>　　<ruby>分<rt>ふん</rt></ruby></u>
-            </div>
-            <div class="answer-line">
-                <span style="visibility: hidden;"><span class="num-symbol">▽</span> <ruby>答<rt>こた</rt></ruby>え</span> (<span class="num-symbol">2</span>)：<u>　　<ruby>時<rt>じ</rt></ruby>　　<ruby>分<rt>ふん</rt></ruby></u>
-            </div>
-        </div>
+        <!-- 時刻表下の所要時間表示 -->
+        <div class="travel-times" id="travelTimesDisplay"></div>
+
+        <!-- 問題リスト -->
+        <div class="q-list" id="questionList"></div>
     </div>
 </div>
 
 <script>
-// 時刻表データの保持用
 let currentTimetable = {};
 
-// ゼロ埋め関数
 function padZero(num) {
     return num.toString().padStart(2, '0');
 }
 
-// 乱数生成関数（min以上max以下）
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// 時刻表の生成
+// 現在時刻入力欄の有効/無効切り替え
+function toggleTimeInput() {
+    const isRandom = document.getElementById('timeRandom').checked;
+    document.getElementById('specHour').disabled = isRandom;
+    document.getElementById('specMin').disabled = isRandom;
+}
+
+// 画面の切り替え
+function showConfig() {
+    document.getElementById('page-config').style.display = 'block';
+    document.getElementById('page-print').style.display = 'none';
+}
+
+function buildAndShow() {
+    if (!generateProblem()) return; // エラーがあれば中断
+    document.getElementById('page-config').style.display = 'none';
+    document.getElementById('page-print').style.display = 'block';
+}
+
+// 時刻表の生成 (7時〜18時)
 function generateTimetable(isRandomMins) {
     const body = document.getElementById('timetableBody');
     body.innerHTML = '';
     currentTimetable = {};
 
-    for (let h = 7; h <= 23; h++) {
+    // なだらかな本数変化 (7時〜18時)
+    const counts = {
+        7: 8, 8: 7, 9: 5, 10: 4, 11: 4, 12: 4,
+        13: 4, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8
+    };
+
+    for (let h = 7; h <= 18; h++) {
         let mins = [];
-        let count = 0;
-        
-        // 通勤時間帯（7-8時、17-19時）は本数を増やす
-        if ((h >= 7 && h <= 8) || (h >= 17 && h <= 19)) {
-            count = isRandomMins ? getRandomInt(7, 12) : 10; // ランダムまたは均等10本
-        } else {
-            count = isRandomMins ? getRandomInt(3, 6) : 4;  // ランダムまたは均等4本
-        }
+        let count = counts[h];
 
         if (isRandomMins) {
-            // 1分単位ランダムの場合
             while (mins.length < count) {
                 let m = getRandomInt(0, 59);
                 if (!mins.includes(m)) mins.push(m);
             }
             mins.sort((a, b) => a - b);
         } else {
-            // 5分おきなどの均等の場合（キリの良い数字にする）
+            // 等間隔
             let step = Math.floor(60 / count);
-            // 均等でも少し開始をずらすなどするとリアルだが、シンプルに0から
             for (let i = 0; i < count; i++) {
-                // stepが15(4本), 6(10本)などになる。
-                // 5の倍数に近づける処理
                 let m = i * step;
-                if(step === 6) m = i * 5; // 10本なら5分おき（0,5,10...45）
+                if (count === 8) m = i * 7; // 8本の場合は少し調整
+                if (count === 7) m = i * 8; 
                 mins.push(m);
             }
         }
@@ -294,91 +320,127 @@ function generateTimetable(isRandomMins) {
         currentTimetable[h] = mins;
         
         const tr = document.createElement('tr');
-        const minStr = mins.map(m => `<span class="num-symbol">${padZero(m)}</span>`).join('　');
-        tr.innerHTML = `<td class="hour"><span class="num-symbol">${h}</span></td><td class="minutes">${minStr}</td>`;
+        const minStr = mins.map(m => `<span class="num-font">${padZero(m)}</span>`).join('　');
+        tr.innerHTML = `<td class="hour">${h}</td><td class="minutes">${minStr}</td>`;
         body.appendChild(tr);
     }
 }
 
-// 問題の生成
+// 問題全体の生成
 function generateProblem() {
-    // 1. 設定の取得
-    const isRandomMins = document.getElementById('intervalType').value === '1';
-    let pos = document.getElementById('startPos').value;
-    let destValue = document.getElementById('destination').value;
-    let durationValue = document.getElementById('duration').value;
-
-    // ランダム選択の処理
-    if (pos === 'random') {
-        pos = Math.random() < 0.5 ? 'station' : 'home';
-    }
+    const homeToStation = parseInt(document.getElementById('homeToStation').value, 10);
+    const stationToDest = parseInt(document.getElementById('stationToDest').value, 10);
+    const qCount = parseInt(document.getElementById('qCount').value, 10);
     
-    let destName = "", destRuby = "";
-    if (destValue === 'random') {
-        const dests = [
-            {name: "青空", ruby: "あおぞら"},
-            {name: "希望", ruby: "きぼう"},
-            {name: "未来", ruby: "みらい"},
-            {name: "桜町", ruby: "さくらまち"},
-            {name: "朝日", ruby: "あさひ"}
-        ];
-        const r = dests[getRandomInt(0, dests.length - 1)];
-        destName = r.name;
-        destRuby = r.ruby;
-    } else {
-        const parts = destValue.split(',');
-        destName = parts[0];
-        destRuby = parts[1];
-    }
-
-    let duration = 0;
-    if (durationValue === 'random') {
-        duration = getRandomInt(10, 45); // 10分〜45分の間
-    } else {
-        duration = parseInt(durationValue, 10);
-    }
-
-    // 2. 時刻表の描画
-    generateTimetable(isRandomMins);
-
-    // 行き先の表示更新
-    document.getElementById('displayDestinationTable').innerHTML = `<ruby>${destName}<rt>${destRuby}</rt></ruby>駅`;
-
-    // 3. 問題文に使う時刻の決定 (7時〜22時の間)
-    const targetHour = getRandomInt(7, 22);
-    const targetMin = getRandomInt(0, 59);
-
-    // 4. 問題文テキストの組み立て
-    let contextStr = "";
-    if (pos === 'station') {
-        contextStr = `いま、あなたは<ruby>駅<rt>えき</rt></ruby>にいます。<ruby>現在<rt>げんざい</rt></ruby>の<ruby>時刻<rt>じこく</rt></ruby>は <strong class="num-symbol">${targetHour}</strong><ruby>時<rt>じ</rt></ruby><strong class="num-symbol">${padZero(targetMin)}</strong><ruby>分<rt>ふん</rt></ruby> です。`;
-    } else {
-        const walkTime = getRandomInt(2, 5) * 5; // 10分, 15分, 20分, 25分
-        contextStr = `あなたは<ruby>家<rt>いえ</rt></ruby>にいます。<ruby>駅<rt>えき</rt></ruby>から<ruby>家<rt>いえ</rt></ruby>までは<ruby>歩<rt>ある</rt></ruby>いて <strong class="num-symbol">${walkTime}</strong><ruby>分<rt>ふん</rt></ruby> かかります。<strong class="num-symbol">${targetHour}</strong><ruby>時<rt>じ</rt></ruby><strong class="num-symbol">${padZero(targetMin)}</strong><ruby>分<rt>ふん</rt></ruby> に<ruby>家<rt>いえ</rt></ruby>を<ruby>出<rt>で</rt></ruby>ました。`;
-    }
-    document.getElementById('qTextContext').innerHTML = contextStr;
-
-    // (2) の問題文組み立て（所要時間の提示）
-    const arrivalStr = `(<span class="num-symbol">2</span>) (<span class="num-symbol">1</span>)で<ruby>求<rt>もと</rt></ruby>めた<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ると、<ruby>${destName}<rt>${destRuby}</rt></ruby><ruby>駅<rt>えき</rt></ruby>には<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>到着<rt>とうちゃく</rt></ruby>しますか。<br>
-    　　（<ruby>電車<rt>でんしゃ</rt></ruby>の<ruby>所要時間<rt>しょようじかん</rt></ruby>は <strong class="num-symbol">${duration}</strong><ruby>分<rt>ふん</rt></ruby> とします）`;
+    const isTimeRandom = document.getElementById('timeRandom').checked;
+    const specHour = parseInt(document.getElementById('specHour').value, 10);
+    const specMin = parseInt(document.getElementById('specMin').value, 10);
     
-    document.getElementById('qTextArrival').innerHTML = arrivalStr;
+    const destValue = document.getElementById('destination').value.split(',');
+    const destName = destValue[0];
+    const destRuby = destValue[1];
+    
+    const isIntervalRandom = document.getElementById('intervalType').value === '1';
 
-    /* * ※自動解答計算ロジック（今後の機能拡張やコンソール確認用）
-     * 実際にプリントに解答を印字する機能を追加したい場合は、
-     * ここで計算した結果を非表示要素などに出力します。
-     */
-    let readyHour = targetHour;
-    let readyMin = targetMin;
-    if (pos === 'home') {
-        // 家を出る時間 + 徒歩時間 = 駅に着く時間
-        readyMin += 15; // 仮置きではなく実際のwalkTimeを加算する場合は変数スコープを調整
-        // 簡単のためここでは計算処理のみ記述し、画面には出しません。
+    // 選択された問題タイプの取得
+    const activeTypes = [];
+    for(let i=1; i<=7; i++) {
+        if(document.getElementById('type' + i).checked) activeTypes.push(i);
     }
+    if(activeTypes.length === 0) {
+        alert("問題の種類を少なくとも1つ選んでください。");
+        return false;
+    }
+
+    // 時刻表描画
+    generateTimetable(isIntervalRandom);
+    document.getElementById('displayDest').innerHTML = `<ruby>${destName}<rt>${destRuby}</rt></ruby>`;
+
+    // 所要時間表示
+    document.getElementById('travelTimesDisplay').innerText = 
+        `（家から近くの駅まで ${homeToStation} 分、近くの駅から${destName}駅まで ${stationToDest} 分）`;
+
+    // 扱いやすいように時刻表を「絶対分（0:00からの分数）」の1次元配列にする
+    let timetableAbs = [];
+    for(let h in currentTimetable) {
+        currentTimetable[h].forEach(m => timetableAbs.push(parseInt(h) * 60 + m));
+    }
+    timetableAbs.sort((a, b) => a - b);
+    const lastTrainMin = timetableAbs[timetableAbs.length - 1];
+
+    const qList = document.getElementById('questionList');
+    qList.innerHTML = '';
+
+    // 問題の生成ループ
+    for (let i = 0; i < qCount; i++) {
+        const type = activeTypes[Math.floor(Math.random() * activeTypes.length)];
+        let qText = "";
+        let ansText = `<u>　　<ruby>時<rt>じ</rt></ruby>　　<ruby>分<rt>ふん</rt></ruby></u>`; // デフォルトの解答欄
+
+        // 基準となる現在時刻の決定
+        let baseMin = 0;
+        if (!isTimeRandom) {
+            baseMin = specHour * 60 + specMin;
+        } else {
+            // ランダムの場合は、最終電車の少し前までの時間を生成
+            baseMin = getRandomInt(7 * 60, lastTrainMin - 1);
+        }
+
+        // --- 問題タイプごとの文言生成 ---
+        if (type === 1) {
+            let trainMin = timetableAbs.find(t => t >= baseMin) || lastTrainMin;
+            let bH = Math.floor(baseMin / 60); let bM = baseMin % 60;
+            qText = `いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">${bH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(bM)}</span><ruby>分<rt>ふん</rt></ruby>です。<ruby>次<rt>つぎ</rt></ruby>に<ruby>来<rt>く</rt></ruby>る<ruby>電車<rt>でんしゃ</rt></ruby>は<ruby>何時何分<rt>なんじなんぷん</rt></ruby>ですか。`;
+        }
+        else if (type === 2) {
+            let trainMin = timetableAbs.find(t => t >= baseMin) || lastTrainMin;
+            let bH = Math.floor(baseMin / 60); let bM = baseMin % 60;
+            qText = `いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">${bH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(bM)}</span><ruby>分<rt>ふん</rt></ruby>です。<ruby>電車<rt>でんしゃ</rt></ruby>はあと<ruby>何分<rt>なんぷん</rt></ruby>で<ruby>来<rt>き</rt></ruby>ますか。`;
+            ansText = `<u>　　<ruby>分後<rt>ふんご</rt></ruby></u>`;
+        }
+        else if (type === 3) {
+            let arrivalAtStation = baseMin + homeToStation;
+            let trainMin = timetableAbs.find(t => t >= arrivalAtStation);
+            if(!trainMin) { // 最終に間に合わない場合は時間を巻き戻す
+                baseMin = lastTrainMin - homeToStation - 15;
+            }
+            let bH = Math.floor(baseMin / 60); let bM = baseMin % 60;
+            qText = `<ruby>家<rt>いえ</rt></ruby>を<span class="num-font">${bH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(bM)}</span><ruby>分<rt>ふん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>します。<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>れますか。`;
+        }
+        else if (type === 4) {
+            let trainMin = timetableAbs[getRandomInt(0, timetableAbs.length - 1)];
+            let tH = Math.floor(trainMin / 60); let tM = trainMin % 60;
+            qText = `<span class="num-font">${tH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(tM)}</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>るには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。`;
+        }
+        else if (type === 5) {
+            let trainMin = timetableAbs[getRandomInt(0, timetableAbs.length - 1)];
+            let tH = Math.floor(trainMin / 60); let tM = trainMin % 60;
+            qText = `<span class="num-font">${tH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(tM)}</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ると、<ruby>${destName}<rt>${destRuby}</rt></ruby><ruby>駅<rt>えき</rt></ruby>には<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>きますか。`;
+        }
+        else if (type === 6) {
+            let trainMin = timetableAbs[getRandomInt(0, timetableAbs.length - 1)];
+            let destAbs = trainMin + stationToDest;
+            let dH = Math.floor(destAbs / 60); let dM = destAbs % 60;
+            qText = `<ruby>${destName}<rt>${destRuby}</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">${dH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(dM)}</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ればいいですか。`;
+        }
+        else if (type === 7) {
+            let trainMin = timetableAbs[getRandomInt(0, timetableAbs.length - 1)];
+            let destAbs = trainMin + stationToDest;
+            let dH = Math.floor(destAbs / 60); let dM = destAbs % 60;
+            qText = `<ruby>${destName}<rt>${destRuby}</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">${dH}</span><ruby>時<rt>じ</rt></ruby><span class="num-font">${padZero(dM)}</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。`;
+        }
+
+        // HTMLへ追加
+        const div = document.createElement('div');
+        div.className = 'q-item';
+        div.innerHTML = `<span class="q-num">(${i + 1})</span> <span class="q-text">${qText}</span> <span class="q-ans">${ansText}</span>`;
+        qList.appendChild(div);
+    }
+    return true;
 }
 
-// ページ読み込み時に1回実行
-window.onload = generateProblem;
+// ページ読み込み時に初期化
+window.onload = toggleTimeInput;
 </script>
 
 </body>
