@@ -178,12 +178,6 @@
                 <option value="5">5分ごと</option>
                 <option value="1">1分ごと</option>
             </select>
-        </label><br>
-        <label style="margin-top: 10px;">家を出発する時刻（現在時刻）：
-            <select id="departTimeType" style="font-size: 12pt; padding: 5px;">
-                <option value="5">5分ごと</option>
-                <option value="1">1分ごと</option>
-            </select>
         </label>
     </div>
 
@@ -375,35 +369,35 @@ function generateProblem() {
 
         if (type === 1) {
             var bH = Math.floor(baseMin/60), bM = baseMin%60;
-            qText = 'いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(bM)+'</span><ruby>分<rt>ふん</rt></ruby>です。すぐ<ruby>乗<rt>の</rt></ruby>れる<ruby>電車<rt>でんしゃ</rt></ruby>は<ruby>何時何分<rt>なんじなんぷん</rt></ruby>ですか。';
+            qText = 'いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+bM+'</span><ruby>分<rt>ふん</rt></ruby>です。すぐ<ruby>乗<rt>の</rt></ruby>れる<ruby>電車<rt>でんしゃ</rt></ruby>は<ruby>何時何分<rt>なんじなんぷん</rt></ruby>ですか。';
         } else if (type === 2) {
             var bH = Math.floor(baseMin/60), bM = baseMin%60;
-            qText = 'いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(bM)+'</span><ruby>分<rt>ふん</rt></ruby>です。<ruby>電車<rt>でんしゃ</rt></ruby>はあと<ruby>何分<rt>なんぷん</rt></ruby>で<ruby>来<rt>き</rt></ruby>ますか。';
+            qText = 'いま<ruby>駅<rt>えき</rt></ruby>にいて、<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+bM+'</span><ruby>分<rt>ふん</rt></ruby>です。<ruby>電車<rt>でんしゃ</rt></ruby>はあと<ruby>何分<rt>なんぷん</rt></ruby>で<ruby>来<rt>き</rt></ruby>ますか。';
         } else if (type === 3) {
             var arrivalAtStation = baseMin + homeToStation;
             var trainMin = null;
             for(var j=0;j<timetableAbs.length;j++){if(timetableAbs[j]>=arrivalAtStation){trainMin=timetableAbs[j];break;}}
             if (!trainMin) { baseMin = lastTrainMin - homeToStation - 15; if(isBaseTime5Min) baseMin = Math.round(baseMin/5)*5; }
             var bH = Math.floor(baseMin/60), bM = baseMin%60;
-            qText = '<ruby>家<rt>いえ</rt></ruby>を<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(bM)+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>します。<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>れますか。';
+            qText = '<ruby>家<rt>いえ</rt></ruby>を<span class="num-font">'+bH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+bM+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>します。<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>れますか。';
         } else if (type === 4) {
             var trainMin = timetableAbs[getRandomInt(0, timetableAbs.length-1)];
             var tH = Math.floor(trainMin/60), tM = trainMin%60;
-            qText = '<span class="num-font">'+tH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(tM)+'</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>るには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。';
+            qText = '<span class="num-font">'+tH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+tM+'</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>るには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。';
         } else if (type === 5) {
             var trainMin = timetableAbs[getRandomInt(0, timetableAbs.length-1)];
             var tH = Math.floor(trainMin/60), tM = trainMin%60;
-            qText = '<span class="num-font">'+tH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(tM)+'</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ると、<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>には<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>きますか。';
+            qText = '<span class="num-font">'+tH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+tM+'</span><ruby>分<rt>ふん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ると、<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>には<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>きますか。';
         } else if (type === 6) {
             var trainMin = timetableAbs[getRandomInt(0, timetableAbs.length-1)];
             var destAbs = trainMin + stationToDest;
             var dH = Math.floor(destAbs/60), dM = destAbs%60;
-            qText = '<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">'+dH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(dM)+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ればいいですか。';
+            qText = '<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">'+dH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+dM+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>何時何分<rt>なんじなんぷん</rt></ruby>の<ruby>電車<rt>でんしゃ</rt></ruby>に<ruby>乗<rt>の</rt></ruby>ればいいですか。';
         } else if (type === 7) {
             var trainMin = timetableAbs[getRandomInt(0, timetableAbs.length-1)];
             var destAbs = trainMin + stationToDest;
             var dH = Math.floor(destAbs/60), dM = destAbs%60;
-            qText = '<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">'+dH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+padZero(dM)+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。';
+            qText = '<ruby>'+destName+'<rt>'+destRuby+'</rt></ruby><ruby>駅<rt>えき</rt></ruby>に<span class="num-font">'+dH+'</span><ruby>時<rt>じ</rt></ruby><span class="num-font">'+dM+'</span><ruby>分<rt>ふん</rt></ruby>に<ruby>着<rt>つ</rt></ruby>くには、<ruby>家<rt>いえ</rt></ruby>を<ruby>何時何分<rt>なんじなんぷん</rt></ruby>に<ruby>出発<rt>しゅっぱつ</rt></ruby>したらいいですか。';
         }
 
         var div = document.createElement('div');
