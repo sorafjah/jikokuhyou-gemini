@@ -93,9 +93,13 @@
         .minutes { text-align: left; padding-left: 15px; letter-spacing: 5px; font-size: 1.1em; }
         .travel-times { text-align: center; margin-top: 10px; margin-bottom: 30px; font-size: 11pt; }
         .q-list { margin-top: 20px; }
-        .q-item { margin-bottom: 25px; page-break-inside: avoid; line-height: 2.0; }
-        .q-num { margin-right: 5px; font-family: "Arial", sans-serif; }
-        .q-ans { margin-left: 15px; display: inline-block; white-space: nowrap; }
+        .q-item {
+            margin-bottom: 25px; page-break-inside: avoid; line-height: 2.0;
+            display: flex; flex-wrap: wrap; align-items: baseline;
+        }
+        .q-num { margin-right: 5px; font-family: "Arial", sans-serif; flex-shrink: 0; }
+        .q-text { flex: 1 1 auto; }
+        .q-ans { margin-left: auto; white-space: nowrap; flex-shrink: 0; }
         .q-ans u { text-decoration-thickness: 1px; text-underline-offset: 4px; letter-spacing: 2px; }
         [contenteditable="true"] { outline: none; border-radius: 3px; transition: background-color 0.2s; }
         [contenteditable="true"]:hover { background-color: #ffffcc; cursor: text; }
@@ -189,6 +193,7 @@
     <div id="copyToast" class="copy-toast">コピーしました！</div>
 
     <div class="print-container" id="printContainer">
+        <div class="name-field"><ruby>名前<rt>なまえ</rt></ruby>：<span></span></div>
         <p contenteditable="true"><ruby>次<rt>つぎ</rt></ruby>の<ruby>時刻表<rt>じこくひょう</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、<ruby>下<rt>した</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>に<ruby>答<rt>こた</rt></ruby>えましょう。</p>
 
         <table id="timetable" contenteditable="true">
