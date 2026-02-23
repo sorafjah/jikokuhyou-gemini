@@ -147,7 +147,13 @@
 
     <div class="config-section">
         <h3>2. 問題の条件</h3>
-        <label>問題数： <input type="number" id="qCount" value="5" min="1" max="20"> 問</label>
+        <label>問題数： <input type="number" id="qCount" value="5" min="1" max="20"> 問</label><br>
+        <label>現在時刻（いま○時○分）：
+            <select id="baseTimeType" style="font-size: 12pt; padding: 5px;">
+                <option value="5">5分ごと</option>
+                <option value="1">1分ごと</option>
+            </select>
+        </label>
         <div class="checkbox-list" style="margin-top: 15px;">
             <label><input type="checkbox" id="type1" checked> 「いま駅にいて、○時○分です。すぐ乗れる電車は何時何分ですか？」</label>
             <label><input type="checkbox" id="type2" checked> 「いま駅にいて、○時○分です。電車はあと何分で来ますか？」</label>
@@ -164,17 +170,17 @@
         <label>家から駅まで：
             <select id="homeToStationType" style="font-size: 12pt; padding: 5px;">
                 <option value="5">5分ごと</option>
-                <option value="1">ランダム</option>
+                <option value="1">1分ごと</option>
             </select>
         </label><br>
         <label style="margin-top: 10px;">駅から目的駅まで：
             <select id="stationToDestType" style="font-size: 12pt; padding: 5px;">
                 <option value="5">5分ごと</option>
-                <option value="1">ランダム</option>
+                <option value="1">1分ごと</option>
             </select>
         </label><br>
         <label style="margin-top: 10px;">家を出発する時刻（現在時刻）：
-            <select id="baseTimeType" style="font-size: 12pt; padding: 5px;">
+            <select id="departTimeType" style="font-size: 12pt; padding: 5px;">
                 <option value="5">5分ごと</option>
                 <option value="1">1分ごと</option>
             </select>
